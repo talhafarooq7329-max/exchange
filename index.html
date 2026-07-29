@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Talha Exchange | Buy & Sell USD, USDT & International Balances</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#050816; --bg2:#0B1224; --blue:#3B82F6; --emerald:#10B981; --gold:#FBBF24;
+    --ink:#FFFFFF; --muted:#94A3B8;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif;
+    overflow-x:hidden;
+  }
+  .display{font-family:'Space Grotesk',sans-serif;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  a{color:inherit; text-decoration:none;}
+  .grad-text{background:linear-gradient(90deg,#3B82F6,#10B981); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .grad-gold{background:linear-gradient(90deg,#FBBF24,#F59E0B); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .glass{background:rgba(11,18,36,0.55); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border:1px solid rgba(148,163,184,0.12);}
+  .glass-strong{background:rgba(11,18,36,0.75); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border:1px solid rgba(148,163,184,0.16);}
+  .border-grad{position:relative; border-radius:inherit;}
+  .border-grad::before{content:""; position:absolute; inset:0; border-radius:inherit; padding:1px;
+    background:linear-gradient(135deg, rgba(59,130,246,.6), rgba(16,185,129,.4), rgba(251,191,36,.35));
+    -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none;}
+  .container{max-width:1280px; margin:0 auto; padding:0 20px;}
+  .btn{display:inline-flex; align-items:center; gap:8px; justify-content:center; border-radius:999px; font-weight:600; padding:14px 28px; font-size:16px; transition:.3s; cursor:pointer; border:none;}
+  .btn:active{transform:scale(.97);}
+  .btn-primary{background:linear-gradient(90deg,#3B82F6,#10B981); color:#fff; box-shadow:0 0 40px -10px rgba(59,130,246,.5);}
+  .btn-primary:hover{filter:brightness(1.1); box-shadow:0 0 40px -10px rgba(16,185,129,.5);}
+  .btn-secondary{background:rgba(11,18,36,.55); border:1px solid rgba(255,255,255,.15); color:#fff; backdrop-filter:blur(18px);}
+  .btn-secondary:hover{border-color:rgba(59,130,246,.5); background:rgba(255,255,255,.05);}
+  .btn-whatsapp{background:#25D366; color:#04140b; box-shadow:0 0 40px -8px rgba(37,211,102,.6);}
+  .btn-whatsapp:hover{filter:brightness(1.05);}
+  .btn-sm{padding:9px 18px; font-size:14px;}
+
+  /* Header */
+  header{position:sticky; top:0; z-index:40; transition:.3s;}
+  header.scrolled{background:rgba(11,18,36,.75); backdrop-filter:blur(24px); box-shadow:0 8px 32px rgba(0,0,0,.37);}
+  .header-inner{display:flex; align-items:center; justify-content:space-between; padding:16px 0;}
+  .logo{display:flex; align-items:center; gap:10px;}
+  .logo-icon{width:36px; height:36px; border-radius:12px; background:linear-gradient(135deg,#3B82F6,#10B981); display:flex; align-items:center; justify-content:center; box-shadow:0 0 40px -10px rgba(59,130,246,.5);}
+  .logo-text{font-weight:700; font-size:18px;}
+  nav{display:none; gap:32px;}
+  nav a{font-size:14px; font-weight:500; color:var(--muted); transition:.2s;}
+  nav a:hover{color:#fff;}
+  @media(min-width:1024px){nav{display:flex;}}
+
+  /* Ticker */
+  .ticker-wrap{position:relative; overflow:hidden; border-bottom:1px solid rgba(255,255,255,.05); background:rgba(11,18,36,.8); padding:10px 0;}
+  .ticker-track{display:flex; width:max-content; animation:marquee 32s linear infinite;}
+  @keyframes marquee{from{transform:translateX(0)} to{transform:translateX(-50%)}}
+  .ticker-item{display:flex; align-items:center; gap:10px; white-space:nowrap; padding:0 24px;}
+  .ticker-item .pair{font-weight:600; font-size:14px;}
+  .ticker-item .val{color:var(--muted); font-size:14px;}
+  .dir-up{color:var(--emerald);} .dir-down{color:#f87171;} .dir-flat{color:var(--muted);}
+  .fade-l,.fade-r{position:absolute; top:0; bottom:0; width:60px; pointer-events:none; z-index:2;}
+  .fade-l{left:0; background:linear-gradient(90deg,var(--bg),transparent);}
+  .fade-r{right:0; background:linear-gradient(270deg,var(--bg),transparent);}
+
+  /* Hero */
+  .hero{position:relative; padding:80px 0 100px; overflow:hidden;}
+  .hero::before{content:""; position:absolute; inset:0;
+    background:radial-gradient(circle at 20% 20%, rgba(59,130,246,.14), transparent 40%),
+               radial-gradient(circle at 80% 0%, rgba(16,185,129,.12), transparent 45%),
+               radial-gradient(circle at 50% 100%, rgba(251,191,36,.08), transparent 40%);}
+  .hero-grid{position:relative; display:grid; grid-template-columns:1fr; gap:60px; align-items:center;}
+  @media(min-width:1024px){.hero-grid{grid-template-columns:1.1fr .9fr;}}
+  .badge{display:inline-flex; align-items:center; gap:8px; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.05); padding:7px 16px; border-radius:999px; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.15em; color:var(--emerald);}
+  .dot{width:6px; height:6px; border-radius:50%; background:var(--emerald); box-shadow:0 0 8px 2px rgba(16,185,129,.7); animation:pulse 3s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:.6; transform:scale(1)} 50%{opacity:1; transform:scale(1.1)}}
+  h1{font-size:44px; font-weight:700; line-height:1.1; margin:22px 0;}
+  @media(min-width:640px){h1{font-size:56px;}}
+  .pills{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:18px;}
+  .pill{display:flex; align-items:center; gap:8px; padding:9px 16px; border-radius:999px; font-size:14px; font-weight:500;}
+  .hero-desc{max-width:480px; color:var(--muted); font-size:18px; margin-bottom:24px;}
+  .hero-ctas{display:flex; flex-wrap:wrap; gap:16px; margin-bottom:30px;}
+  .hero-stats{display:flex; align-items:center; gap:24px; border-top:1px solid rgba(255,255,255,.1); padding-top:24px;}
+  .hs-label{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);}
+  .hs-val{font-size:24px; font-weight:700;}
+  .hs-div{width:1px; height:40px; background:rgba(255,255,255,.1);}
+
+  /* Orbit */
+  .orbit-wrap{position:relative; width:420px; height:420px; margin:0 auto; display:flex; align-items:center; justify-content:center;}
+  @media(min-width:640px){.orbit-wrap{width:480px; height:480px;}}
+  .ring{position:absolute; border:1px solid rgba(255,255,255,.06); border-radius:50%;}
+  .core-glow{position:absolute; width:160px; height:160px; border-radius:50%; background:rgba(59,130,246,.3); filter:blur(60px); animation:pulse 3s ease-in-out infinite;}
+  .phone-card{position:relative; z-index:10; width:170px; height:260px; border-radius:32px; display:flex; flex-direction:column; justify-content:space-between; padding:16px; box-shadow:0 0 40px -10px rgba(59,130,246,.5);}
+  @media(min-width:640px){.phone-card{width:180px; height:290px;}}
+  .phone-top{display:flex; justify-content:space-between; align-items:center;}
+  .phone-top span:first-child{font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.1em; color:var(--muted);}
+  .live-dot{width:8px; height:8px; border-radius:50%; background:var(--emerald); animation:pulse 3s ease-in-out infinite;}
+  .phone-rate-label{font-size:11px; color:var(--muted);}
+  .phone-rate{font-size:30px; font-weight:700;}
+  .phone-bottom{display:flex; justify-content:space-between; font-size:11px;}
+  .orbit-item{position:absolute; left:50%; top:50%; animation:orbit linear infinite;}
+  @keyframes orbit{from{transform:rotate(0deg) translateX(var(--r)) rotate(0deg);} to{transform:rotate(360deg) translateX(var(--r)) rotate(-360deg));}}
+  .chip{display:flex; align-items:center; justify-content:center; border-radius:16px; font-weight:700; box-shadow:0 0 40px -10px rgba(59,130,246,.5); animation:float 6s ease-in-out infinite;}
+  @keyframes float{0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)}}
+
+  section{position:relative;}
+  .section-pad{padding:80px 0;}
+  .heading{display:flex; flex-direction:column; gap:16px; align-items:center; text-align:center; margin-bottom:56px;}
+  .heading h2{font-size:32px; font-weight:700;}
+  @media(min-width:640px){.heading h2{font-size:42px;}}
+  .heading p{max-width:600px; color:var(--muted); font-size:17px;}
+
+  /* Calculator */
+  .calc-card{padding:40px; border-radius:40px;}
+  .calc-grid{display:flex; flex-direction:column; gap:32px;}
+  @media(min-width:1024px){.calc-grid{flex-direction:row; align-items:flex-start;}}
+  .calc-col{flex:1;}
+  .field-label{display:block; margin-bottom:12px; font-size:14px; color:var(--muted);}
+  .curr-btns{display:flex; flex-wrap:wrap; gap:8px;}
+  .curr-btn{border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.02); color:var(--muted); padding:9px 16px; border-radius:12px; font-weight:600; font-size:14px; cursor:pointer; transition:.2s;}
+  .curr-btn.active{border-color:rgba(59,130,246,.6); background:rgba(59,130,246,.15); color:#fff; box-shadow:0 0 40px -10px rgba(59,130,246,.5);}
+  .amount-wrap{position:relative;}
+  .amount-input{width:100%; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.03); border-radius:16px; padding:16px 20px; font-size:24px; font-weight:700; color:#fff; outline:none;}
+  .amount-input:focus{border-color:rgba(59,130,246,.6);}
+  .amount-suffix{position:absolute; right:20px; top:50%; transform:translateY(-50%); font-size:14px; font-weight:600; color:var(--muted);}
+  .result-row{display:flex; align-items:center; justify-content:space-between; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.02); border-radius:16px; padding:16px 20px; margin-bottom:12px;}
+  .result-label{display:flex; align-items:center; gap:10px; font-size:14px; color:var(--muted);}
+  .result-val{font-size:20px; font-weight:700;}
+  .update-note{text-align:center; font-size:12px; color:var(--muted); margin-top:8px;}
+
+  /* Services */
+  .grid-3{display:grid; grid-template-columns:1fr; gap:20px;}
+  @media(min-width:640px){.grid-3{grid-template-columns:1fr 1fr;}}
+  @media(min-width:1024px){.grid-3{grid-template-columns:1fr 1fr 1fr;}}
+  .svc-card{position:relative; overflow:hidden; border-radius:28px; padding:24px; border:1px solid rgba(255,255,255,.1); transition:.3s; display:block;}
+  .svc-card:hover{border-color:rgba(59,130,246,.4); transform:translateY(-6px);}
+  .svc-icon{width:48px; height:48px; border-radius:16px; background:linear-gradient(135deg, rgba(59,130,246,.2), rgba(16,185,129,.2)); display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:18px;}
+  .svc-card h3{font-size:18px; font-weight:700; margin-bottom:8px;}
+  .svc-card p{font-size:14px; color:var(--muted);}
+  .svc-cta{display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--emerald); margin-top:14px; opacity:0; transition:.3s;}
+  .svc-card:hover .svc-cta{opacity:1;}
+
+  /* Why choose us */
+  .grid-4{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media(min-width:640px){.grid-4{grid-template-columns:repeat(3,1fr);}}
+  @media(min-width:1024px){.grid-4{grid-template-columns:repeat(4,1fr);}}
+  .why-card{border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.02); border-radius:18px; padding:20px; transition:.2s;}
+  .why-card:hover{border-color:rgba(16,185,129,.4);}
+  .why-icon{width:44px; height:44px; border-radius:12px; background:linear-gradient(135deg, rgba(16,185,129,.2), rgba(59,130,246,.2)); display:flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:12px;}
+  .why-card h3{font-size:15px; font-weight:700; margin-bottom:6px;}
+  .why-card p{font-size:13px; color:var(--muted);}
+
+  /* How it works */
+  .timeline{position:relative; margin-top:60px;}
+  .timeline-line{position:absolute; left:24px; top:0; bottom:0; width:1px; background:linear-gradient(180deg,#3B82F6,#10B981,#FBBF24);}
+  @media(min-width:640px){.timeline-line{left:50%;}}
+  .step{position:relative; display:flex; align-items:flex-start; gap:20px; margin-bottom:40px;}
+  @media(min-width:640px){.step{width:50%;} .step.right{margin-left:auto; flex-direction:row-reverse; text-align:right;}}
+  .step-icon{position:relative; z-index:1; width:48px; height:48px; border-radius:16px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:20px; box-shadow:0 0 40px -10px rgba(59,130,246,.5);}
+  .step-num{font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.15em; color:var(--emerald);}
+  .step h3{font-size:17px; font-weight:700; margin:4px 0;}
+  .step p{font-size:14px; color:var(--muted);}
+
+  /* Trust stats */
+  .stats-card{border-radius:32px; padding:40px; display:grid; grid-template-columns:1fr 1fr; gap:24px; text-align:center;}
+  @media(min-width:640px){.stats-card{grid-template-columns:repeat(4,1fr);}}
+  .stat-num{font-size:38px; font-weight:700;}
+  @media(min-width:640px){.stat-num{font-size:46px;}}
+  .stat-label{font-size:14px; color:var(--muted); margin-top:4px;}
+
+  /* Testimonials */
+  .rev-card{display:flex; flex-direction:column; gap:14px; border-radius:24px; padding:24px; border:1px solid rgba(255,255,255,.1);}
+  .stars{color:var(--gold); font-size:14px;}
+  .rev-quote{font-size:14px; color:var(--muted); line-height:1.6;}
+  .rev-foot{display:flex; align-items:center; gap:12px; border-top:1px solid rgba(255,255,255,.1); padding-top:14px; margin-top:auto;}
+  .avatar{width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#3B82F6,#10B981); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700;}
+  .rev-name{font-size:14px; font-weight:600;}
+  .rev-role{font-size:12px; color:var(--muted);}
+
+  /* FAQ */
+  .faq-wrap{max-width:720px; margin:0 auto;}
+  .faq-item{border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.02); border-radius:16px; margin-bottom:12px; overflow:hidden;}
+  .faq-item.open{border-color:rgba(59,130,246,.4);}
+  .faq-q{width:100%; display:flex; justify-content:space-between; align-items:center; gap:16px; padding:18px 22px; background:none; border:none; color:#fff; font-weight:600; font-size:15px; text-align:left; cursor:pointer;}
+  .faq-chevron{transition:.3s; color:var(--blue);}
+  .faq-item.open .faq-chevron{transform:rotate(180deg);}
+  .faq-a{max-height:0; overflow:hidden; transition:max-height .3s ease;}
+  .faq-a p{padding:0 22px 18px; font-size:14px; color:var(--muted); line-height:1.6;}
+
+  /* CTA */
+  .cta-box{position:relative; overflow:hidden; border-radius:40px; padding:70px 24px; text-align:center;}
+  @media(min-width:640px){.cta-box{padding:70px 60px;}}
+  .cta-box h2{font-size:32px; font-weight:700; margin:16px 0;}
+  @media(min-width:640px){.cta-box h2{font-size:44px;}}
+  .cta-box p{max-width:520px; margin:0 auto 26px; color:var(--muted); font-size:17px;}
+  .glow1{position:absolute; top:-100px; left:50%; transform:translateX(-50%); width:260px; height:260px; border-radius:50%; background:rgba(59,130,246,.25); filter:blur(70px);}
+  .glow2{position:absolute; bottom:-100px; right:0; width:260px; height:260px; border-radius:50%; background:rgba(16,185,129,.2); filter:blur(70px);}
+
+  /* Footer */
+  footer{border-top:1px solid rgba(255,255,255,.1); background:rgba(11,18,36,.6); padding:56px 0;}
+  .foot-grid{display:grid; grid-template-columns:1fr; gap:40px;}
+  @media(min-width:640px){.foot-grid{grid-template-columns:1fr 1fr;}}
+  @media(min-width:1024px){.foot-grid{grid-template-columns:2fr 1fr 1fr 1fr;}}
+  .foot-desc{font-size:14px; color:var(--muted); margin:16px 0;}
+  .soc{display:flex; gap:10px;}
+  .soc a{width:36px; height:36px; border-radius:8px; border:1px solid rgba(255,255,255,.1); display:flex; align-items:center; justify-content:center; color:var(--muted); transition:.2s;}
+  .soc a:hover{border-color:rgba(59,130,246,.5); color:#fff;}
+  footer h4{font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; margin-bottom:16px;}
+  footer ul{list-style:none;}
+  footer li{margin-bottom:10px; font-size:14px; color:var(--muted);}
+  footer li a:hover{color:#fff;}
+  .foot-bottom{display:flex; flex-direction:column; gap:10px; align-items:center; text-align:center; border-top:1px solid rgba(255,255,255,.1); margin-top:48px; padding-top:32px; font-size:12px; color:var(--muted);}
+  @media(min-width:640px){.foot-bottom{flex-direction:row; justify-content:space-between; text-align:left;}}
+
+  /* Floating */
+  .floating{position:fixed; bottom:24px; right:20px; z-index:50; display:flex; flex-direction:column; align-items:flex-end; gap:12px;}
+  @media(min-width:640px){.floating{bottom:32px; right:32px;}}
+  .fab{width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; border:none; transition:.2s;}
+  .fab:hover{transform:scale(1.05);}
+  .fab-wa{background:#25D366; color:#04140b; box-shadow:0 0 40px -6px rgba(37,211,102,.8); animation:pulse 3s ease-in-out infinite; font-size:26px;}
+  .fab-tg{width:48px; height:48px; background:#229ED9; color:#fff; box-shadow:0 0 30px -6px rgba(34,158,217,.7); font-size:20px;}
+  .fab-top{width:44px; height:44px; display:none; color:#fff; font-size:18px;}
+  .fab-top.show{display:flex;}
+</style>
+</head>
+<body>
+
+<header id="header">
+  <div class="container header-inner">
+    <a href="#top" class="logo">
+      <span class="logo-icon">⇄</span>
+      <span class="logo-text display">Talha<span class="grad-text"> Exchange</span></span>
+    </a>
+    <nav>
+      <a href="#services">Services</a>
+      <a href="#calculator">Rates</a>
+      <a href="#how-it-works">How It Works</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <a href="#" id="wa-header" target="_blank" class="btn btn-whatsapp btn-sm">💬 Chat Now</a>
+  </div>
+</header>
+
+<div class="ticker-wrap">
+  <div class="fade-l"></div><div class="fade-r"></div>
+  <div class="ticker-track" id="ticker-track"></div>
+</div>
+
+<div id="top"></div>
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <span class="badge"><span class="dot"></span> Live rates &middot; Trusted since 2021</span>
+      <h1 class="display">Buy &amp; Sell <span class="grad-text">USD, USDT</span> &amp; International <span class="grad-gold">Balances</span></h1>
+      <div class="pills">
+        <span class="pill glass">⚡ Fast Settlement</span>
+        <span class="pill glass">🛡️ Secure &amp; Verified</span>
+        <span class="pill glass">📈 Best Market Rates</span>
+      </div>
+      <p class="hero-desc">A trusted international dollar exchange service for USD, USDT, and global wallet balances — fast settlement, live market rates, and 24/7 WhatsApp support.</p>
+      <div class="hero-ctas">
+        <a href="#" id="wa-hero" target="_blank" class="btn btn-whatsapp">💬 Chat on WhatsApp</a>
+        <a href="#calculator" class="btn btn-secondary">View Live Rates</a>
+      </div>
+      <div class="hero-stats">
+        <div><div class="hs-val mono" id="hero-market">--</div><div class="hs-label">USD/PKR Market</div></div>
+        <div class="hs-div"></div>
+        <div><div class="hs-val mono" id="hero-buy" style="color:var(--emerald)">--</div><div class="hs-label">We Buy</div></div>
+        <div class="hs-div"></div>
+        <div><div class="hs-val mono" id="hero-sell" style="color:var(--gold)">--</div><div class="hs-label">We Sell</div></div>
+      </div>
+    </div>
+
+    <div class="orbit-wrap">
+      <div class="ring" style="width:300px;height:300px;"></div>
+      <div class="ring" style="width:420px;height:420px;"></div>
+      <div class="ring" style="width:520px;height:520px;"></div>
+      <div class="core-glow"></div>
+      <div class="phone-card glass-strong border-grad">
+        <div class="phone-top"><span>LIVE RATE</span><span class="live-dot"></span></div>
+        <div>
+          <div class="phone-rate-label">USD / PKR</div>
+          <div class="phone-rate mono" id="phone-market">--</div>
+        </div>
+        <div class="phone-bottom">
+          <div><div style="color:var(--muted)">Buy</div><div class="mono" style="font-weight:700;color:var(--emerald)" id="phone-buy">--</div></div>
+          <div style="text-align:right"><div style="color:var(--muted)">Sell</div><div class="mono" style="font-weight:700;color:var(--gold)" id="phone-sell">--</div></div>
+        </div>
+      </div>
+      <div class="orbit-item" style="--r:75px; animation-duration:18s;"><span class="chip glass-strong border-grad" style="width:56px;height:56px;font-size:14px;">USD</span></div>
+      <div class="orbit-item" style="--r:75px; animation-duration:18s; animation-delay:-9s;"><span class="chip glass-strong border-grad" style="width:48px;height:48px;font-size:12px;">USDT</span></div>
+      <div class="orbit-item" style="--r:105px; animation-duration:24s;"><span class="chip glass-strong border-grad" style="width:44px;height:44px;font-size:10px;">Wise</span></div>
+      <div class="orbit-item" style="--r:105px; animation-duration:24s; animation-delay:-12s;"><span class="chip glass-strong border-grad" style="width:44px;height:44px;font-size:10px;">Payoneer</span></div>
+      <div class="orbit-item" style="--r:130px; animation-duration:30s;"><span class="chip glass-strong border-grad" style="width:40px;height:40px;font-size:9px;">PayPal</span></div>
+      <div class="orbit-item" style="--r:130px; animation-duration:30s; animation-delay:-15s;"><span class="chip glass-strong border-grad" style="width:40px;height:40px;font-size:9px;">Binance</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="calculator" class="section-pad">
+  <div class="container" style="max-width:900px;">
+    <div class="heading">
+      <span class="badge" style="color:var(--blue)"><span class="dot" style="background:var(--blue);box-shadow:0 0 8px 2px rgba(59,130,246,.7)"></span>Live Calculator</span>
+      <h2 class="display">Instant <span class="grad-text">Rate Calculator</span></h2>
+      <p>Select a currency, enter an amount, and see live market, buy, and sell values update instantly.</p>
+    </div>
+    <div class="calc-card glass border-grad">
+      <div class="calc-grid">
+        <div class="calc-col">
+          <label class="field-label">Select Currency</label>
+          <div class="curr-btns" id="curr-btns"></div>
+          <div style="height:24px"></div>
+          <label class="field-label">Enter Amount</label>
+          <div class="amount-wrap">
+            <input type="number" id="amount-input" class="amount-input" value="100" min="0" />
+            <span class="amount-suffix" id="amount-suffix">USD</span>
+          </div>
+          <div style="height:24px"></div>
+          <a href="#" id="wa-calc" target="_blank" class="btn btn-whatsapp" style="width:100%">💬 Confirm on WhatsApp</a>
+        </div>
+        <div class="calc-col">
+          <div class="result-row"><span class="result-label">⇄ Market Value</span><span class="result-val mono" id="res-market">--</span></div>
+          <div class="result-row"><span class="result-label">⇄ You Receive (Sell)</span><span class="result-val mono" style="color:var(--gold)" id="res-sell">--</span></div>
+          <div class="result-row"><span class="result-label">⇄ We Pay (Buy)</span><span class="result-val mono" style="color:var(--emerald)" id="res-buy">--</span></div>
+          <p class="update-note" id="update-note">Fetching live market rate…</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="services" class="section-pad">
+  <div class="container">
+    <div class="heading">
+      <span class="badge" style="color:var(--blue)"><span class="dot" style="background:var(--blue);box-shadow:0 0 8px 2px rgba(59,130,246,.7)"></span>Our Services</span>
+      <h2 class="display">Everything You Need to <span class="grad-text">Move Money</span></h2>
+      <p>One trusted partner for every currency and wallet balance you deal with — priced live, settled fast.</p>
+    </div>
+    <div class="grid-3" id="services-grid"></div>
+  </div>
+</section>
+
+<section class="section-pad">
+  <div class="container">
+    <div class="heading">
+      <span class="badge" style="color:var(--gold)"><span class="dot" style="background:var(--gold);box-shadow:0 0 8px 2px rgba(251,191,36,.7)"></span>Why Talha Exchange</span>
+      <h2 class="display">Built on <span class="grad-gold">Trust</span> &amp; <span class="grad-text">Speed</span></h2>
+    </div>
+    <div class="grid-4" id="why-grid"></div>
+  </div>
+</section>
+
+<section id="how-it-works" class="section-pad">
+  <div class="container" style="max-width:1000px;">
+    <div class="heading">
+      <span class="badge" style="color:var(--blue)"><span class="dot" style="background:var(--blue);box-shadow:0 0 8px 2px rgba(59,130,246,.7)"></span>How It Works</span>
+      <h2 class="display">Five Steps to a <span class="grad-text">Finished Exchange</span></h2>
+    </div>
+    <div class="timeline">
+      <div class="timeline-line"></div>
+      <div id="steps"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section-pad" style="padding-top:24px;">
+  <div class="container" style="max-width:1000px;">
+    <div class="stats-card glass border-grad">
+      <div><div class="stat-num display" id="st-1">0</div><div class="stat-label">Transactions</div></div>
+      <div><div class="stat-num display" id="st-2">0</div><div class="stat-label">Happy Clients</div></div>
+      <div><div class="stat-num display" id="st-3">0</div><div class="stat-label">Positive Feedback</div></div>
+      <div><div class="stat-num display" id="st-4">0</div><div class="stat-label">Years Experience</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="reviews" class="section-pad">
+  <div class="container">
+    <div class="heading">
+      <span class="badge" style="color:var(--gold)"><span class="dot" style="background:var(--gold);box-shadow:0 0 8px 2px rgba(251,191,36,.7)"></span>Client Reviews</span>
+      <h2 class="display">Trusted by <span class="grad-gold">Thousands</span> of Clients</h2>
+    </div>
+    <div class="grid-3" id="reviews-grid"></div>
+  </div>
+</section>
+
+<section id="faq" class="section-pad">
+  <div class="container">
+    <div class="heading">
+      <span class="badge" style="color:var(--blue)"><span class="dot" style="background:var(--blue);box-shadow:0 0 8px 2px rgba(59,130,246,.7)"></span>FAQ</span>
+      <h2 class="display">Frequently Asked <span class="grad-text">Questions</span></h2>
+    </div>
+    <div class="faq-wrap" id="faq-wrap"></div>
+  </div>
+</section>
+
+<section class="section-pad">
+  <div class="container" style="max-width:900px;">
+    <div class="cta-box glass-strong border-grad">
+      <div class="glow1"></div><div class="glow2"></div>
+      <div style="position:relative;">
+        <span class="badge" style="color:var(--gold)">Ready When You Are</span>
+        <h2 class="display">Ready to Exchange Dollars?</h2>
+        <p>Message our team now for a live quote — most exchanges are confirmed and settled within minutes.</p>
+        <div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center;">
+          <a href="#" id="wa-cta" target="_blank" class="btn btn-whatsapp">💬 Chat on WhatsApp</a>
+          <a href="#" id="tg-cta" target="_blank" class="btn btn-secondary">✈️ Message on Telegram</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="foot-grid">
+      <div>
+        <a href="#top" class="logo"><span class="logo-icon">⇄</span><span class="logo-text display">Talha<span class="grad-text"> Exchange</span></span></a>
+        <p class="foot-desc">A trusted international dollar exchange service for USD, USDT, and global wallet balances — fast settlement, live market rates, and 24/7 WhatsApp support.</p>
+        <div class="soc">
+          <a href="#">f</a><a href="#">ig</a><a href="#" id="tg-foot">tg</a>
+        </div>
+      </div>
+      <div>
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#calculator">Calculator</a></li>
+          <li><a href="#how-it-works">How It Works</a></li>
+          <li><a href="#reviews">Reviews</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Business Hours</h4>
+        <ul>
+          <li>Mon–Fri: 9:00 AM – 11:00 PM</li>
+          <li>Sat–Sun: 10:00 AM – 10:00 PM</li>
+          <li style="color:var(--emerald)">WhatsApp support 24/7</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li>✉ support@talhaexchange.com</li>
+          <li>📍 Multan, Punjab, Pakistan</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <p>&copy; 2026 Talha Exchange. All rights reserved.</p>
+      <p>Rates shown are indicative and confirmed live via WhatsApp before every transaction.</p>
+    </div>
+  </div>
+</footer>
+
+<div class="floating">
+  <button class="fab fab-top" id="back-top">↑</button>
+  <a href="#" id="tg-float" target="_blank" class="fab fab-tg">✈️</a>
+  <a href="#" id="wa-float" target="_blank" class="fab fab-wa">💬</a>
+</div>
+
+<script>
+// ---------- CONFIG (mirrors config.ts) ----------
+const CONFIG = {
+  whatsappNumber: "923001234567",
+  whatsappMsg: "Hi Talha Exchange, I'd like to exchange currency. Can you share today's rate?",
+  telegramUsername: "talhaexchange",
+  currencies: [
+    {code:"USD", label:"US Dollar"}, {code:"USDT", label:"Tether"}, {code:"EUR", label:"Euro"},
+    {code:"GBP", label:"British Pound"}, {code:"AED", label:"UAE Dirham"}, {code:"SAR", label:"Saudi Riyal"}, {code:"INR", label:"Indian Rupee"}
+  ],
+  tickerPairs: ["USD","USDT","EUR","GBP","AED","SAR","INR"],
+  margins: {
+    USD:{buy:5,sell:5}, USDT:{buy:4,sell:4}, EUR:{buy:6,sell:6}, GBP:{buy:7,sell:7},
+    AED:{buy:1.5,sell:1.5}, SAR:{buy:1.2,sell:1.2}, INR:{buy:0.3,sell:0.3}
+  },
+  refreshMs: 60000
+};
+function waLink(msg){ return `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(msg || CONFIG.whatsappMsg)}`; }
+function tgLink(){ return `https://t.me/${CONFIG.telegramUsername}`; }
+document.querySelectorAll('#wa-header,#wa-hero,#wa-calc,#wa-cta,#wa-float').forEach(el=>el.href=waLink());
+document.querySelectorAll('#tg-cta,#tg-foot,#tg-float').forEach(el=>el.href=tgLink());
+
+function fmt(n){ return new Intl.NumberFormat('en-US',{maximumFractionDigits:2}).format(n); }
+
+// ---------- LIVE RATES ----------
+const FALLBACK = { USD:288, USDT:287, EUR:312, GBP:365, AED:78.4, SAR:76.8, INR:3.45 };
+let market = {...FALLBACK};
+let prevMarket = {...FALLBACK};
+let lastUpdated = null;
+
+function quote(code){
+  const m = market[code];
+  const marg = CONFIG.margins[code] || {buy:5, sell:5};
+  return { market:m, buy:+(m+marg.buy).toFixed(2), sell:+(m-marg.sell).toFixed(2) };
+}
+function direction(code){
+  if(market[code] > prevMarket[code]) return 'up';
+  if(market[code] < prevMarket[code]) return 'down';
+  return 'flat';
+}
+
+async function fetchRates(){
+  try{
+    const res = await fetch('https://open.er-api.com/v6/latest/USD');
+    const data = await res.json();
+    const rates = data.rates;
+    if(!rates || !rates.PKR) throw new Error('bad data');
+    const usdPkr = rates.PKR;
+    const derive = code => rates[code] ? usdPkr/rates[code] : usdPkr;
+    prevMarket = {...market};
+    market = {
+      USD: usdPkr, USDT: +(usdPkr-1).toFixed(2), EUR: derive('EUR'),
+      GBP: derive('GBP'), AED: derive('AED'), SAR: derive('SAR'), INR: derive('INR')
+    };
+    lastUpdated = new Date();
+    document.getElementById('update-note').textContent = `Rates updated ${lastUpdated.toLocaleTimeString()} · refreshes every 60s`;
+  }catch(e){
+    document.getElementById('update-note').textContent = 'Showing indicative rates (live feed unavailable)';
+  }
+  renderAll();
+}
+
+function renderTicker(){
+  const track = document.getElementById('ticker-track');
+  const items = [...CONFIG.tickerPairs, ...CONFIG.tickerPairs];
+  track.innerHTML = items.map(code=>{
+    const q = quote(code); const dir = direction(code);
+    const arrow = dir==='up' ? '▲' : dir==='down' ? '▼' : '–';
+    const cls = dir==='up' ? 'dir-up' : dir==='down' ? 'dir-down' : 'dir-flat';
+    return `<div class="ticker-item"><span class="pair mono">${code}/PKR</span><span class="val mono">${fmt(q.market)}</span><span class="${cls}" style="font-size:11px;font-weight:700">${arrow}</span><span style="color:rgba(255,255,255,.1)">•</span></div>`;
+  }).join('');
+}
+
+function renderHero(){
+  const q = quote('USD');
+  document.getElementById('hero-market').textContent = fmt(q.market);
+  document.getElementById('hero-buy').textContent = fmt(q.buy);
+  document.getElementById('hero-sell').textContent = fmt(q.sell);
+  document.getElementById('phone-market').textContent = fmt(q.market);
+  document.getElementById('phone-buy').textContent = fmt(q.buy);
+  document.getElementById('phone-sell').textContent = fmt(q.sell);
+}
+
+let currentCurrency = 'USD';
+function renderCalculator(){
+  const wrap = document.getElementById('curr-btns');
+  wrap.innerHTML = CONFIG.currencies.map(c=>`<button class="curr-btn ${c.code===currentCurrency?'active':''}" data-code="${c.code}">${c.code}</button>`).join('');
+  wrap.querySelectorAll('.curr-btn').forEach(btn=>{
+    btn.onclick = ()=>{ currentCurrency = btn.dataset.code; updateCalc(); };
+  });
+  updateCalc();
+}
+function updateCalc(){
+  document.querySelectorAll('.curr-btn').forEach(b=>b.classList.toggle('active', b.dataset.code===currentCurrency));
+  document.getElementById('amount-suffix').textContent = currentCurrency;
+  const amt = parseFloat(document.getElementById('amount-input').value) || 0;
+  const q = quote(currentCurrency);
+  document.getElementById('res-market').textContent = fmt(amt*q.market) + ' PKR';
+  document.getElementById('res-sell').textContent = fmt(amt*q.sell) + ' PKR';
+  document.getElementById('res-buy').textContent = fmt(amt*q.buy) + ' PKR';
+  document.getElementById('wa-calc').href = waLink(`Hi, I want to exchange ${amt} ${currentCurrency}. Can you confirm today's rate?`);
+}
+document.getElementById('amount-input').addEventListener('input', updateCalc);
+
+function renderAll(){ renderTicker(); renderHero(); updateCalc(); }
+
+fetchRates();
+setInterval(fetchRates, CONFIG.refreshMs);
+
+// ---------- STATIC CONTENT ----------
+const SERVICES = [
+  {icon:'💵', title:'Buy USD', desc:'Purchase physical or wallet USD at competitive live rates.'},
+  {icon:'💵', title:'Sell USD', desc:'Convert your USD to local currency instantly and securely.'},
+  {icon:'₮', title:'Buy USDT', desc:'Acquire USDT (Tether) with fast, verified settlement.'},
+  {icon:'₮', title:'Sell USDT', desc:'Liquidate USDT at the best market-linked rate available.'},
+  {icon:'📤', title:'Wise Balance', desc:'Load or cash out your Wise multi-currency balance.'},
+  {icon:'💳', title:'Payoneer Balance', desc:'Exchange Payoneer balances quickly with no hassle.'},
+  {icon:'👛', title:'PayPal Balance', desc:'Trusted PayPal balance buying and selling service.'},
+  {icon:'🏦', title:'Skrill Balance', desc:'Secure Skrill exchange with transparent pricing.'},
+  {icon:'🏛️', title:'Revolut Exchange', desc:'Convert Revolut balances at accurate, live rates.'},
+  {icon:'⇄', title:'Binance P2P', desc:'Reliable Binance P2P trading with verified counterparties.'},
+  {icon:'🌐', title:'International Transfers', desc:'Send and receive funds globally, fast and securely.'}
+];
+document.getElementById('services-grid').innerHTML = SERVICES.map(s=>`
+  <a href="${waLink(`Hi, I'm interested in ${s.title}. Please share the current rate.`)}" target="_blank" class="svc-card glass">
+    <div class="svc-icon">${s.icon}</div>
+    <h3 class="display">${s.title}</h3>
+    <p>${s.desc}</p>
+    <span class="svc-cta">💬 Chat to exchange</span>
+  </a>`).join('');
+
+const WHY = [
+  {icon:'🛡️', title:'100% Secure', desc:'Every transaction is verified and protected end to end.'},
+  {icon:'⚡', title:'Fast Payment', desc:'Funds settle within minutes of confirmation, not days.'},
+  {icon:'🏆', title:'Trusted Service', desc:'Thousands of repeat clients across multiple countries.'},
+  {icon:'📈', title:'Best Exchange Rates', desc:'Live market-linked pricing with transparent margins.'},
+  {icon:'✅', title:'Verified Transactions', desc:'Full transaction history and confirmation on request.'},
+  {icon:'🧾', title:'No Hidden Charges', desc:"The rate you're quoted is the rate you get. Always."},
+  {icon:'🕐', title:'24/7 Support', desc:'Our WhatsApp line is staffed around the clock.'},
+  {icon:'👥', title:'Professional Team', desc:'Experienced exchange specialists handling every order.'}
+];
+document.getElementById('why-grid').innerHTML = WHY.map(w=>`
+  <div class="why-card"><div class="why-icon">${w.icon}</div><h3 class="display">${w.title}</h3><p>${w.desc}</p></div>`).join('');
+
+const STEPS = [
+  {icon:'💬', title:'Message on WhatsApp', desc:'Tell us what you want to exchange and how much.'},
+  {icon:'📈', title:'Receive Live Rate', desc:"We confirm today's live market rate instantly."},
+  {icon:'📤', title:'Send Payment', desc:'Transfer funds through your preferred payment method.'},
+  {icon:'🤝', title:'Receive Dollars', desc:'Get your USD, USDT, or balance credited right away.'},
+  {icon:'✅', title:'Transaction Complete', desc:'Confirmation sent — your exchange is done.'}
+];
+document.getElementById('steps').innerHTML = STEPS.map((s,i)=>`
+  <div class="step ${i%2? 'right':''}">
+    <span class="step-icon glass-strong border-grad" style="color:var(--blue)">${s.icon}</span>
+    <div><div class="step-num">Step ${i+1}</div><h3 class="display">${s.title}</h3><p>${s.desc}</p></div>
+  </div>`).join('');
+
+const REVIEWS = [
+  {name:'Ahmed R.', role:'Freelancer', quote:"Sold my Payoneer balance in under ten minutes. The rate matched exactly what they quoted on WhatsApp.", init:'AR'},
+  {name:'Sara K.', role:'E-commerce Seller', quote:'I exchange USDT weekly for my business. Always fast, always transparent — never a single issue.', init:'SK'},
+  {name:'Bilal M.', role:'Remote Developer', quote:"Best rates I've found for Wise and Payoneer. Their team responds within minutes, even late at night.", init:'BM'},
+  {name:'Fatima N.', role:'Import Business Owner', quote:'Handling large international transfers used to be stressful. This team makes it simple and secure.', init:'FN'},
+  {name:'Usman T.', role:'Crypto Trader', quote:'Binance P2P settlements are instant and their support genuinely knows the market. Highly recommended.', init:'UT'},
+  {name:'Ayesha H.', role:'Consultant', quote:'Transparent pricing, no hidden charges, and they explain everything clearly before you commit.', init:'AH'}
+];
+document.getElementById('reviews-grid').innerHTML = REVIEWS.map(r=>`
+  <div class="rev-card glass">
+    <div style="display:flex;justify-content:space-between"><span class="stars">★★★★★</span><span style="opacity:.15">❝</span></div>
+    <p class="rev-quote">"${r.quote}"</p>
+    <div class="rev-foot"><span class="avatar">${r.init}</span><div><div class="rev-name">${r.name}</div><div class="rev-role">${r.role}</div></div></div>
+  </div>`).join('');
+
+const FAQS = [
+  {q:'How is your exchange rate calculated?', a:"We pull the live market rate every 60 seconds and apply a small, transparent margin on top for buying and subtracted for selling. You'll always see the exact market rate alongside our quoted rate."},
+  {q:'How fast is a typical transaction?', a:'Most transactions settle within 10–30 minutes of payment confirmation, depending on the platform and amount involved.'},
+  {q:'Which platforms do you support?', a:'We support USD cash, USDT, Wise, Payoneer, PayPal, Skrill, Revolut, and Binance P2P, along with general international transfers.'},
+  {q:'Is there a minimum or maximum exchange amount?', a:"Minimums and maximums vary by platform and currency. Message us on WhatsApp with your amount and we'll confirm instantly."},
+  {q:'How do I know this service is trustworthy?', a:"We've completed thousands of transactions with a 99% positive feedback rate. We're happy to share verified transaction history and client references on request."},
+  {q:'What if the market rate changes during my transaction?', a:'Once we confirm a rate with you on WhatsApp, that rate is locked for your transaction as long as payment is completed within the agreed window.'}
+];
+const faqWrap = document.getElementById('faq-wrap');
+faqWrap.innerHTML = FAQS.map((f,i)=>`
+  <div class="faq-item ${i===0?'open':''}" data-i="${i}">
+    <button class="faq-q">${f.q}<span class="faq-chevron">⌄</span></button>
+    <div class="faq-a"><p>${f.a}</p></div>
+  </div>`).join('');
+faqWrap.querySelectorAll('.faq-item').forEach(item=>{
+  const a = item.querySelector('.faq-a');
+  if(item.classList.contains('open')) a.style.maxHeight = a.scrollHeight+'px';
+  item.querySelector('.faq-q').onclick = ()=>{
+    const wasOpen = item.classList.contains('open');
+    faqWrap.querySelectorAll('.faq-item').forEach(i2=>{ i2.classList.remove('open'); i2.querySelector('.faq-a').style.maxHeight=null; });
+    if(!wasOpen){ item.classList.add('open'); a.style.maxHeight = a.scrollHeight+'px'; }
+  };
+});
+
+// Stat counters
+const STATS = [{id:'st-1', val:5000, suf:'+'},{id:'st-2', val:3000, suf:'+'},{id:'st-3', val:99, suf:'%'},{id:'st-4', val:4, suf:'+'}];
+let counted = false;
+function animateCounters(){
+  if(counted) return;
+  const el = document.getElementById('st-1');
+  if(!el || el.getBoundingClientRect().top > window.innerHeight) return;
+  counted = true;
+  STATS.forEach(s=>{
+    const target = document.getElementById(s.id);
+    const start = performance.now(); const dur = 1500;
+    function tick(now){
+      const p = Math.min((now-start)/dur, 1);
+      const eased = 1-Math.pow(1-p,3);
+      target.textContent = Math.round(s.val*eased).toLocaleString()+s.suf;
+      if(p<1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+}
+window.addEventListener('scroll', animateCounters);
+animateCounters();
+
+// Header scroll state + back to top
+const header = document.getElementById('header');
+const backTop = document.getElementById('back-top');
+window.addEventListener('scroll', ()=>{
+  header.classList.toggle('scrolled', window.scrollY>24);
+  backTop.classList.toggle('show', window.scrollY>600);
+});
+backTop.onclick = ()=>window.scrollTo({top:0, behavior:'smooth'});
+
+renderCalculator();
+renderTicker();
+</script>
+</body>
+</html>
