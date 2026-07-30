@@ -504,24 +504,14 @@ function direction(code){
   return 'flat';
 }
 
+// Rates are set manually here (not pulled from a public FX API), so the
+// USD/PKR rate always matches what you're actually quoting clients: 288.
+// To change rates later, just edit the numbers in FALLBACK above.
 async function fetchRates(){
-  try{
-    const res = await fetch('https://open.er-api.com/v6/latest/USD');
-    const data = await res.json();
-    const rates = data.rates;
-    if(!rates || !rates.PKR) throw new Error('bad data');
-    const usdPkr = rates.PKR;
-    const derive = code => rates[code] ? usdPkr/rates[code] : usdPkr;
-    prevMarket = {...market};
-    market = {
-      USD: usdPkr, USDT: +(usdPkr-1).toFixed(2), EUR: derive('EUR'),
-      GBP: derive('GBP'), AED: derive('AED'), SAR: derive('SAR'), INR: derive('INR')
-    };
-    lastUpdated = new Date();
-    document.getElementById('update-note').textContent = `Rates updated ${lastUpdated.toLocaleTimeString()} · refreshes every 60s`;
-  }catch(e){
-    document.getElementById('update-note').textContent = 'Showing indicative rates (live feed unavailable)';
-  }
+  prevMarket = {...market};
+  market = {...FALLBACK};
+  lastUpdated = new Date();
+  document.getElementById('update-note').textContent = `Rate set ${lastUpdated.toLocaleTimeString()} · manually configured`;
   renderAll();
 }
 
